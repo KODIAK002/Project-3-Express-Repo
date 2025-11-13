@@ -14,6 +14,10 @@ mongoose.connection.on("connected", () => {
   console.log(`Connected to MongoDB ${mongoose.connection.name}.`);
 });
 
+app.get("/", (req,res) => {
+    res.send('hello world')
+});
+
 
 app.listen(port, () => {
   console.log(`The express app is ready on port ${port}!`);
