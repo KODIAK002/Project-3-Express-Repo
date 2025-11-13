@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 
 const plaindromeSchema = new mongoose.Schema({
-    text: { String, trim: true },
+    text: { type: String, trim: true },
     normalized: String,
     isPalindrome: Boolean,
     createdAt: { type: Date, default: Date.now }
