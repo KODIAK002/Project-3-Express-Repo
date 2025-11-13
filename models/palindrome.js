@@ -5,10 +5,11 @@ const palindromeSchema = new mongoose.Schema({
     normalized: String,
     isPalindrome: Boolean,
     createdAt: { type: Date, default: Date.now }
-    
+    description: String,
 })
 
 const Palindrome = mongoose.model('Palindrome', palindromeSchema)
+
 
 
 module.exports = Palindrome
