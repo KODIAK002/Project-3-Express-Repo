@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-const plaindromeSchema = new mongoose.Schema({
+const palindromeSchema = new mongoose.Schema({
     text: { type: String, trim: true },
     normalized: String,
     isPalindrome: Boolean,
@@ -8,7 +8,7 @@ const plaindromeSchema = new mongoose.Schema({
     
 })
 
-const Palindrome = mongoose.model('Palindrome', plaindromeSchema)
+const Palindrome = mongoose.model('Palindrome', palindromeSchema)
 
 
 module.exports = Palindrome
