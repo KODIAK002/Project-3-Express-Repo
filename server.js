@@ -1,5 +1,4 @@
 const Palindrome = require('./models/palindrome.js')
-const { processedString, isPalindrome } = require('./utils/palindrome.js');
 const express = require('express');
 const dotenv = require('dotenv');
 dotenv.config();
