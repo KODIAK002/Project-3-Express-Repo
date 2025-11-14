@@ -4,6 +4,8 @@ dotenv.config(); // load environment variables into process.env
 const mongoose = require('mongoose'); // import mongoose for MongoDB access
 const cors = require('cors'); // import cors to allow cross-origin requests
 const palindromeRouter = require('./routes/palindromeRoutes'); // import palindrome routes that use the shared schema
+const Palindrome = require('./models/palindrome.js')
+const { processedString, isPalindrome } = require('./utils/palindrome.js');
 const app = express(); // create the express application instance
 
 const port = process.env.PORT ? process.env.PORT : '3000'; // choose provided port or fall back to 3000
