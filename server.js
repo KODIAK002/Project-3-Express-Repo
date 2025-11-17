@@ -1,3 +1,4 @@
+const Palindrome = require('./models/palindrome.js')
 const express = require('express');
 const dotenv = require('dotenv');
 dotenv.config();
@@ -11,6 +12,10 @@ mongoose.connect(process.env.MONGODB_URI);
 // log connection status to terminal on start
 mongoose.connection.on("connected", () => {
   console.log(`Connected to MongoDB ${mongoose.connection.name}.`);
+});
+
+app.get("/", (req,res) => {
+    res.send('hello world')
 });
 
 
