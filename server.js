@@ -3,10 +3,16 @@ const dotenv = require('dotenv'); // import dotenv to read .env config
 dotenv.config(); // load environment variables into process.env
 const mongoose = require('mongoose'); // import mongoose for MongoDB access
 const cors = require('cors'); // import cors to allow cross-origin requests
-const palindromeRouter = require('./routes/palindromeRoutes'); // import palindrome routes that use the shared schema
-const Palindrome = require('./models/palindrome.js')
-const { processedString, isPalindrome } = require('./utils/palindrome.js');
 const app = express(); // create the express application instance
+const logger = require('morgan');
+
+const palindromeRouter = require('./routes/palindromeRoutes.js'); // import palindrome routes that use the shared schema
+const authRouter = require('./auth/tokens.js');
+const userAuth = require('./auth/login.js');
+
+app.use(cors());
+app.use(express.json());
+app.use(logger('dev'));
 
 const port = process.env.PORT ? process.env.PORT : '3000'; // choose provided port or fall back to 3000
 
@@ -28,7 +34,10 @@ mongoose.connection.on('error', (err) => { // surface connection errors for easi
 
 app.use(cors()); // enable cross-origin requests (needed for separate React frontend)
 app.use(express.json()); // register JSON body parsing middleware
-app.use('/palindromes', palindromeRouter); // mount the palindrome router on its base path
+
+app.use('/auth', authRouter);
+app.use('/user', userAuth);
+app.use('/palindrome', palindromeRouter); // mount the palindrome router on its base path
 
 app.listen(port, () => { // start listening for HTTP requests
   console.log(`The express app is ready on port ${port}!`); // confirm which port is active
