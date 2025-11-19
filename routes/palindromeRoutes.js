@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const Palindrome = require('../models/palindrome');
-const { processedString, isPalindrome } = require('../utils/palindrome');
+const Palindrome = require('../models/palindrome.js')
+const { processedString, isPalindrome } = require('../utils/palindrome.js');
 
 const router = express.Router();
 
@@ -20,10 +20,64 @@ router.get('/', async (req, res) => {
   }
 });
 
+router.get('/search', async (req, res) => {
+  const { query } = req.query;
+
+  if (!query || typeof query !== 'string') {
+    return res.status(400).json({ message: 'A valid search query is required' });
+  }
+
+  try {
+    const results = await Palindrome.find({
+      $or: [
+        { text: { $regex: query, $options: 'i' } },
+        { description: { $regex: query, $options: 'i' } }
+      ]
+    }).sort({ createdAt: -1 });
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'No palindromes found matching your query' });
+    }
+
+    res.json(results);
+  } catch (error) {
+    res.status(500).json({ message: 'Unable to search palindromes', error: error.message });
+  }
+})
+
+
+// ---------------------------
+// POST: /palindromes
+// ---------------------------
+router.post('/palindrome', async (req, res) => {
+  const { text } = req.body;
+  if (!text || typeof text !== 'string') {
+    return res.status(400).json({ message: 'A text string is required' });
+  }
+
+
+  try {
+    const normalized = processedString(text);
+    const palindromeFlag = isPalindrome(text, processedString);
+
+
+
+    const palindrome = await Palindrome.create({
+      text,
+      normalized,
+      isPalindrome: palindromeFlag,
+      description: req.body.description,
+    });
+
+    res.status(201).json(palindrome);
+  } catch (error) {
+    res.status(500).json({ message: 'Unable to create palindrome', error: error.message });
+  }
+});
+
 // ---------------------------
 // GET: /palindromes/:id
 // ---------------------------
-router.get('/:id', async (req, res) => {
+router.get('/palindrome/:id', async (req, res) => {
   const { id } = req.params;
 
   if (!validateId(id)) return res.status(400).json({ message: 'Invalid palindrome id' });
@@ -37,35 +91,11 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// ---------------------------
-// POST: /palindromes
-// ---------------------------
-router.post('/', async (req, res) => {
-  const { text } = req.body;
-  if (!text || typeof text !== 'string') {
-    return res.status(400).json({ message: 'A text string is required' });
-  }
-
-  try {
-    const normalized = processedString(text);
-    const palindromeFlag = isPalindrome(text, processedString);
-
-    const palindrome = await Palindrome.create({
-      text,
-      normalized,
-      isPalindrome: palindromeFlag,
-    });
-
-    res.status(201).json(palindrome);
-  } catch (error) {
-    res.status(500).json({ message: 'Unable to create palindrome', error: error.message });
-  }
-});
 
 // ---------------------------
 // PATCH: /palindromes/:id
 // ---------------------------
-router.patch('/:id', async (req, res) => {
+router.patch('/palindrome/:id', async (req, res) => {
   const { id } = req.params;
   const { text } = req.body;
 
@@ -92,7 +122,7 @@ router.patch('/:id', async (req, res) => {
 // ---------------------------
 // DELETE: /palindromes/:id
 // ---------------------------
-router.delete('/:id', async (req, res) => {
+router.delete('/palindrome/:id', async (req, res) => {
   const { id } = req.params;
   if (!validateId(id)) return res.status(400).json({ message: 'Invalid palindrome id' });
 
@@ -109,7 +139,7 @@ router.delete('/:id', async (req, res) => {
 // ---------------------------
 // POST: /palindromes/check
 // ---------------------------
-router.post('/check', (req, res) => {
+router.post('/palindrome/check', (req, res) => {
   const { text } = req.body;
   if (!text || typeof text !== 'string') return res.status(400).json({ message: 'A text string is required' });
 
