@@ -20,6 +20,30 @@ router.get('/', async (req, res) => {
   }
 });
 
+router.get('/search', async (req, res) => {
+  const { query } = req.query;
+
+  if (!query || typeof query !== 'string') {
+    return res.status(400).json({ message: 'A valid search query is required' });
+  }
+
+  try {
+    const results = await Palindrome.find({
+      $or: [
+        { text: { $regex: query, $options: 'i' } },
+        { description: { $regex: query, $options: 'i' } }
+      ]
+    }).sort({ createdAt: -1 });
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'No palindromes found matching your query' });
+    }
+
+    res.json(results);
+  } catch (error) {
+    res.status(500).json({ message: 'Unable to search palindromes', error: error.message });
+  }
+})
+
 
 // ---------------------------
 // POST: /palindromes
@@ -71,7 +95,7 @@ router.get('/palindrome/:id', async (req, res) => {
 // ---------------------------
 // PATCH: /palindromes/:id
 // ---------------------------
-router.patch('palindrome/:id', async (req, res) => {
+router.patch('/palindrome/:id', async (req, res) => {
   const { id } = req.params;
   const { text } = req.body;
 
